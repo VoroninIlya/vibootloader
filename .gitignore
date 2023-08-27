@@ -1,0 +1,23 @@
+#ignore bakup files
+*.bak
+*.old
+*.user
+
+#ignore build artifacts
+build
+generated/TouchGFX/build
+
+generated/build
+
+#ignore unnecessary generated libs etc.
+generated/MDK-ARM
+generated/Middlewares/ST/touchgfx/lib/linux
+generated/Middlewares/ST/touchgfx/lib/sdl2
+generated/Middlewares/ST/touchgfx/lib/win
+generated/Middlewares/ST/touchgfx/lib/core/cortex_m0
+generated/Middlewares/ST/touchgfx/lib/core/cortex_m33
+generated/Middlewares/ST/touchgfx/lib/core/cortex_m7
+generated/TouchGFX/generated/simulator
+generated/TouchGFX/simulator
+*tools*
+*libjpeg*

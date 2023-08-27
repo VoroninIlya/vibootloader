@@ -1,0 +1,6 @@
+add_subdirectory(Core)
+add_subdirectory(Drivers)
+add_subdirectory(FATFS)
+add_subdirectory(Middlewares)
+add_subdirectory(TouchGFX)
+add_subdirectory(USB_DEVICE)
