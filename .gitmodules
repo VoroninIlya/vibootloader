@@ -1,3 +1,6 @@
 [submodule "modules/vistmachine"]
 	path = modules/vistmachine
 	url = git@github.com:VoroninIlya/vistmachine.git
+[submodule "modules/unity"]
+	path = modules/unity
+	url = git@github.com:VoroninIlya/Unity.git
