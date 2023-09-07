@@ -51,6 +51,22 @@
             "problemMatcher": []
         },
         {
+          "type": "shell",
+          "label": "CubeProg: Flash full erase",
+          "command": "STM32_Programmer_CLI",
+          "args": [
+              "--connect",
+              "port=swd",
+              "--erase",
+              "all",
+              "-hardRst"
+          ],
+          "options": {
+              "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+      },
+        {
             "type": "shell",
             "label": "CubeProg: Flash project with defined serial number (SWD) - you must set serial number first",
             "command": "STM32_Programmer_CLI",

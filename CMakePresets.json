@@ -1,83 +1,94 @@
 {
-    "version": 3,
-    "configurePresets": [
-        {
-            "name": "default_arm",
-            "hidden": true,
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-            }
-        },
-        {
-            "name": "default_win64",
-            "hidden": true,
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "toolchainFile": "${sourceDir}/cmake/x86_64-w64-mingw32-gcc.cmake",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "UNITY_EXTENSION_FIXTURE": "ON",
-                "UNITY_EXTENSION_MEMORY": "ON"
-            }
-        },
-        {
-            "name": "Debug_ARM",
-            "inherits": "default_arm",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "RelWithDebInfo_ARM",
-            "inherits": "default_arm",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-            }
-        },
-        {
-            "name": "Release_ARM",
-            "inherits": "default_arm",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "MinSizeRel_ARM",
-            "inherits": "default_arm",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "MinSizeRel"
-            }
-        },
-        {
-            "name": "Debug_win64",
-            "inherits": "default_win64",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "INCLUDE_TEST_SOURCES": "ON"
-            }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "tests",
-            "description": "",
-            "displayName": "",
-            "configurePreset": "Debug_win64",
-            "targets": [
-                "tst_vibootloader"
-            ]
-        },
-        {
-            "name": "vibootloader",
-            "description": "",
-            "displayName": "",
-            "configurePreset": "Debug_ARM",
-            "targets": [
-                "vibootloader"
-            ]
-        }
-    ]
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "default_arm",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "default_win64",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/cmake/x86_64-w64-mingw32-gcc.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "UNITY_EXTENSION_FIXTURE": "ON",
+        "UNITY_EXTENSION_MEMORY": "ON"
+      }
+    },
+    {
+      "name": "Debug_ARM",
+      "inherits": "default_arm",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "RelWithDebInfo_ARM",
+      "inherits": "default_arm",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "Release_ARM",
+      "inherits": "default_arm",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "MinSizeRel_ARM",
+      "inherits": "default_arm",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel"
+      }
+    },
+    {
+      "name": "Debug_win64",
+      "inherits": "default_win64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "tests",
+      "description": "",
+      "displayName": "",
+      "configurePreset": "Debug_win64",
+      "targets": [
+        "tst_vibootloader",
+        "tst_vistmachine",
+        "tst_viflashdrv"
+      ]
+    },
+    {
+      "name": "vibootloader",
+      "description": "",
+      "displayName": "",
+      "configurePreset": "Debug_ARM",
+      "targets": [
+        "vistmachine",
+        "viflashdrv",
+        "vibootloader"
+      ]
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "tst_vibootloader",
+      "description": "",
+      "displayName": "",
+      "configurePreset": "Debug_win64"
+    }
+  ]
 }

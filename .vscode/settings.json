@@ -1,3 +1,19 @@
 {
-    "cortex-debug.armToolchainPath": "C:/SysGCC/arm-eabi/bin"
+    "cortex-debug.armToolchainPath": "C:/SysGCC/arm-eabi/bin",
+    "files.associations": {
+      "cstdlib": "c",
+      "typeinfo": "c",
+      "vistmachine.h": "c",
+      "stm32f4xx_hal_def.h": "c",
+      "viflashdrv.h": "c",
+      "stm32f4xx_hal_rcc_ex.h": "c",
+      "stm32f4xx_hal_flash_ex.h": "c",
+      "stm32f4xx_hal_flash_ramfunc.h": "c",
+      "stm32f4xx_hal.h": "c",
+      "stm32f4xx_hal_conf.h": "c",
+      "stm32f4xx_hal_flash.h": "c",
+      "vistm32flash.h": "c",
+      "ff_gen_drv.h": "c"
+    },
+    "cortex-debug.variableUseNaturalFormat": false
 }

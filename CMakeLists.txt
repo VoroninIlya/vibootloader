@@ -15,6 +15,7 @@ message("Build type: "              ${CMAKE_BUILD_TYPE})
 #
 project(vibootloader)
 enable_language(C CXX ASM)
+enable_testing()
 
 # Set linker script
 set(linker_script_SRC               ${PROJ_PATH}/generated/gcc/STM32F429ZITX_FLASH.ld)
@@ -34,12 +35,13 @@ set(symbols_SYMB
     USE_FULL_ASSERT 
     USE_HAL_DRIVER 
     STM32F429xx
-    ONLY_TOHCGFX_GENERATED
 )
 
 add_subdirectory(${PROJ_PATH}/generated)
 add_subdirectory(${PROJ_PATH}/modules/unity)
 add_subdirectory(${PROJ_PATH}/modules/vistmachine)
+add_subdirectory(${PROJ_PATH}/modules/viflashdrv)
+add_subdirectory(${PROJ_PATH}/modules/vistm32helpers)
 
 get_property(sources GLOBAL PROPERTY sources_list)
 get_property(includes GLOBAL PROPERTY include_paths_list)
@@ -83,7 +85,7 @@ target_link_options(${EXECUTABLE} PRIVATE
 )
 
 target_link_libraries(${EXECUTABLE} PRIVATE "${PROJ_PATH}/generated/Middlewares/ST/touchgfx/lib/core/cortex_m4f/gcc/libtouchgfx-float-abi-hard.a")
-target_link_libraries(${EXECUTABLE} PRIVATE vistmachine)
+target_link_libraries(${EXECUTABLE} PRIVATE vistmachine viflashdrv)
 
 # Execute post-build to print size
 add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
@@ -105,6 +107,9 @@ add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
 #
 project(tst_vibootloader)
 
+#include(CodeCoverage)
+include(CTest)
+
 enable_language(C CXX ASM)
 
 set(TST_EXECUTABLE tst_vibootloader)
@@ -114,10 +119,10 @@ set_property(GLOBAL PROPERTY include_paths_list)
 #
 # Symbols definition
 #
-set(symbols_SYMB
+#set(symbols_SYMB
     # Put here your symbols (preprocessor defines), one in each line
     # Encapsulate them with double quotes for safety purpose
-)
+#)
 
 # Executable files
 add_executable(${TST_EXECUTABLE} ${PROJ_PATH}/tests/main/main.c ${tst_sources})
@@ -139,5 +144,7 @@ target_compile_options(${TST_EXECUTABLE} PRIVATE
     -Wpedantic
 )
 
-target_link_libraries(${TST_EXECUTABLE} vistmachine)
 target_link_libraries(${TST_EXECUTABLE} unity)
+add_test(NAME tst_vibootloader COMMAND tst_vibootloader)
+
+

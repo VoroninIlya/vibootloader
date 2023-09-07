@@ -36,6 +36,8 @@
 #include <string.h>
 #include "ff_gen_drv.h"
 
+#include "viflashdrv.h"
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
@@ -81,7 +83,7 @@ DSTATUS USER_initialize (
 )
 {
   /* USER CODE BEGIN INIT */
-    Stat = STA_NOINIT;
+    Stat = RES_OK;
     return Stat;
   /* USER CODE END INIT */
 }
@@ -96,8 +98,10 @@ DSTATUS USER_status (
 )
 {
   /* USER CODE BEGIN STATUS */
-    Stat = STA_NOINIT;
-    return Stat;
+  if(0 == pdrv)
+    return RES_OK;
+
+  return STA_NODISK;
   /* USER CODE END STATUS */
 }
 
@@ -117,7 +121,11 @@ DRESULT USER_read (
 )
 {
   /* USER CODE BEGIN READ */
-    return RES_OK;
+  if(0 == pdrv)
+    return (DRESULT)VIFLASH_Read ((uint8_t*)buff, 
+      (uint32_t)sector, (uint32_t)count);
+  
+  return RES_PARERR;
   /* USER CODE END READ */
 }
 
@@ -139,7 +147,11 @@ DRESULT USER_write (
 {
   /* USER CODE BEGIN WRITE */
   /* USER CODE HERE */
-    return RES_OK;
+  if(0 == pdrv)
+    return (DRESULT)VIFLASH_Write ((const uint8_t*)buff, 
+      (uint32_t)sector, (uint32_t) count);
+
+  return RES_PARERR;
   /* USER CODE END WRITE */
 }
 #endif /* _USE_WRITE == 1 */
@@ -159,8 +171,10 @@ DRESULT USER_ioctl (
 )
 {
   /* USER CODE BEGIN IOCTL */
-    DRESULT res = RES_ERROR;
-    return res;
+  if(0 == pdrv)
+    return VIFLASH_ioctl (cmd, buff) ;
+
+  return RES_ERROR;
   /* USER CODE END IOCTL */
 }
 #endif /* _USE_IOCTL == 1 */

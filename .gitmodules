@@ -4,3 +4,9 @@
 [submodule "modules/unity"]
 	path = modules/unity
 	url = git@github.com:VoroninIlya/Unity.git
+[submodule "modules/viflashdrv"]
+	path = modules/viflashdrv
+	url = git@github.com:VoroninIlya/viflashdrv.git
+[submodule "modules/vistm32helpers"]
+	path = modules/vistm32helpers
+	url = git@github.com:VoroninIlya/vistm32helpers.git

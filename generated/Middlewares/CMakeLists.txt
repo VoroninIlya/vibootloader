@@ -2,6 +2,7 @@ file(GLOB CORE_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/ST/STM32_USB_Device_Library/Class/MSC/Src/*.c
   ${CMAKE_CURRENT_SOURCE_DIR}/ST/STM32_USB_Device_Library/Core/Src/*.c
   ${CMAKE_CURRENT_SOURCE_DIR}/Third_Party/FatFs/src/*.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Third_Party/FatFs/src/option/*.c
 #  ${CMAKE_CURRENT_SOURCE_DIR}/ST/touchgfx/framework/source/platform/driver/touch/*.cpp
 #  ${CMAKE_CURRENT_SOURCE_DIR}/ST/touchgfx/framework/source/platform/hal/simulator/sdl2/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ST/touchgfx/framework/source/touchgfx/containers/clock/*.cpp
