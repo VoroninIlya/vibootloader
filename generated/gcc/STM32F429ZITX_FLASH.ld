@@ -36,12 +36,6 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
-/* Highest address of the user mode stack */
-_estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
-
-_Min_Heap_Size = 0x100; /* required amount of heap */
-_Min_Stack_Size = 0xA00; /* required amount of stack */
-
 /* Memories definition */
 MEMORY
 {
@@ -50,6 +44,12 @@ MEMORY
   FLASH    (rx)     : ORIGIN = 0x8000000,    LENGTH = 2048K
   SDRAM    (xrw)    : ORIGIN = 0xD0000000,   LENGTH = 8M
 }
+
+/* Highest address of the user mode stack */
+_estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
+
+_Min_Heap_Size = 0x80000; /* required amount of heap */
+_Min_Stack_Size = 0xA00; /* required amount of stack */
 
 /* Sections */
 SECTIONS
@@ -184,13 +184,12 @@ SECTIONS
     __bss_end__ = _ebss;
   } >RAM
 
-  /* User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */
-  ._user_heap_stack :
+  /* User_stack section, used to check that there is enough "RAM" Ram  type memory left */
+  ._user_stack :
   {
     . = ALIGN(8);
     PROVIDE ( end = . );
-    PROVIDE ( _end = . );
-    . = . + _Min_Heap_Size;
+    /*PROVIDE ( _end = . );*/
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >RAM
@@ -206,17 +205,23 @@ SECTIONS
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
   
+  ._user_heap : 
+  {
+    . = ALIGN(8);
+    PROVIDE ( _end = . );
+    . = . + _Min_Heap_Size;
+    . = ALIGN(8);
+  } >SDRAM
+
   TouchGFX_Framebuffer (NOLOAD) : 
   { 
     *(TouchGFX_Framebuffer) 
   } >SDRAM
-  
+
   .user_sdram_memory (NOLOAD) : 
   { 
     . = ALIGN(8);
     user_sdram_memory = .; /* define a global symbol*/
-    . = . + 7M;
     . = ALIGN(8);
   } >SDRAM
-
 }
