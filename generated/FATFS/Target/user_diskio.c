@@ -121,10 +121,13 @@ DRESULT USER_read (
 )
 {
   /* USER CODE BEGIN READ */
-  if(0 == pdrv)
-    return (DRESULT)VIFLASH_Read ((uint8_t*)buff, 
-      (uint32_t)sector, (uint32_t)count);
-  
+  if(0 == pdrv) {
+    __disable_irq();
+    DRESULT res = (DRESULT)VIFLASH_Read ((uint8_t*)buff, 
+      (uint32_t)sector, (uint32_t) count);
+    __enable_irq();
+    return res;
+  }
   return RES_PARERR;
   /* USER CODE END READ */
 }
@@ -147,9 +150,14 @@ DRESULT USER_write (
 {
   /* USER CODE BEGIN WRITE */
   /* USER CODE HERE */
-  if(0 == pdrv)
-    return (DRESULT)VIFLASH_Write ((const uint8_t*)buff, 
+  if(0 == pdrv) {
+    __disable_irq();
+    DRESULT res = (DRESULT)VIFLASH_Write ((const uint8_t*)buff, 
       (uint32_t)sector, (uint32_t) count);
+    __enable_irq();
+    return res;
+  }
+    
 
   return RES_PARERR;
   /* USER CODE END WRITE */
@@ -172,7 +180,7 @@ DRESULT USER_ioctl (
 {
   /* USER CODE BEGIN IOCTL */
   if(0 == pdrv)
-    return VIFLASH_ioctl (cmd, buff) ;
+    return (DRESULT)VIFLASH_Ioctl (cmd, buff) ;
 
   return RES_ERROR;
   /* USER CODE END IOCTL */

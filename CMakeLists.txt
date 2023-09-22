@@ -17,6 +17,7 @@ project(vibootloader)
 enable_language(C CXX ASM)
 enable_testing()
 
+set(UNITY_ROOT_PATH                 ${PROJ_PATH}/modules/unity)
 # Set linker script
 set(linker_script_SRC               ${PROJ_PATH}/generated/gcc/STM32F429ZITX_FLASH.ld)
 set(EXECUTABLE                      vibootloader)
@@ -127,8 +128,14 @@ set_property(GLOBAL PROPERTY include_paths_list)
 # Executable files
 add_executable(${TST_EXECUTABLE} ${PROJ_PATH}/tests/main/main.c ${tst_sources})
 
+message("${tst_includes}" ${tst_includes})
+
 # Include paths
-target_include_directories(${TST_EXECUTABLE} PRIVATE ${tst_includes})
+target_include_directories(${TST_EXECUTABLE} PRIVATE 
+  ${tst_includes}
+  ${UNITY_ROOT_PATH}/extras/fixture/src
+  ${UNITY_ROOT_PATH}/extras/memory/src
+)
 
 # Compilation definition information
 target_compile_definitions(${TST_EXECUTABLE} PUBLIC

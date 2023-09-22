@@ -13,7 +13,8 @@
       "stm32f4xx_hal_conf.h": "c",
       "stm32f4xx_hal_flash.h": "c",
       "vistm32flash.h": "c",
-      "ff_gen_drv.h": "c"
+      "ff_gen_drv.h": "c",
+      "viflashdrv_private.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

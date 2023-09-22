@@ -132,7 +132,7 @@ static LCD_DrvTypeDef* LcdDrv;
 uint32_t I2c3Timeout = I2C3_TIMEOUT_MAX; /*<! Value of Timeout when I2C communication fails */  
 uint32_t Spi5Timeout = SPI5_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */  
 
-static uint32_t ffBuff[1024/4];
+static uint32_t* ffBuff;
 /* USER CODE END 0 */
 
 /**
@@ -177,40 +177,44 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_RTC_Init();
   MX_TouchGFX_Init();
-  /* USER CODE BEGIN 2 */
-  FATFS fs;
-  FRESULT res = f_mount(&fs, (const TCHAR*)(L"M:/"),	1);
-  if(FR_OK != res) {
-    res = f_mkfs((const TCHAR*)(L"M:/"), FM_ANY, _MIN_SS, (void*)ffBuff, 1024);
-    if(FR_OK != res)
-      return 1;
-    res = f_mount(&fs, (const TCHAR*)(L"M:/"),	1);
-    if(FR_OK != res)
-      return 1;
-  }
 
-  FIL fp;
-  res = f_open(&fp, (const TCHAR*)(L"M:/testFile.txt"), FA_CREATE_ALWAYS | FA_OPEN_APPEND | FA_WRITE | FA_READ);
-  if(FR_OK != res && FR_EXIST != res)
-    return 1;
-  char* str = "Hallo from file\n";
-  uint32_t len = strlen(str);
-  res = f_write (&fp, str, len, (UINT*)&(len));
-  if(FR_OK != res)
-    return 1;
+  /* USER CODE BEGIN 2 */
+  //ffBuff = (uint32_t*)malloc(1024);
+  //FATFS fs;
+  //FRESULT res = f_mount(&fs, (const TCHAR*)("M:"),	1);
+  //if(FR_OK != res) {
+  //  res = f_mkfs((const TCHAR*)("M:"), FM_ANY, _MIN_SS, (void*)ffBuff, 1024);
+  //  if(FR_OK != res)
+  //    return 1;
+  //  res = f_mount(&fs, (const TCHAR*)("M:"),	1);
+  //  if(FR_OK != res)
+  //    return 1;
+  //}
+  //
+  //FIL fp;
+  //res = f_open(&fp, (const TCHAR*)("testFile.txt"), FA_CREATE_ALWAYS | FA_OPEN_APPEND | FA_WRITE | FA_READ);
+  //if(FR_OK != res && FR_EXIST != res)
+  //  return 1;
+  //char* str = "Hallo from file\n";
+  //uint32_t len = strlen(str);
+  //res = f_write (&fp, str, len, (UINT*)&(len));
+  //if(FR_OK != res)
+  //  return 1;
   //res = f_sync (&fp);
-  res = f_close (&fp);
-  if(FR_OK != res)
-    return 1;
-  res = f_open(&fp, (const TCHAR*)(L"M:/testFile.txt"), FA_OPEN_EXISTING | FA_READ);
-  if(FR_OK != res && FR_EXIST != res)
-    return 1;
-  char read[30] = {0};
-  len = 30;
-  res = f_read (&fp, read, len, (UINT*)&(len));
-  if(FR_OK != res)
-    return 1;
-  res = f_close (&fp);
+  //res = f_close (&fp);
+  //if(FR_OK != res)
+  //  return 1;
+  //res = f_open(&fp, (const TCHAR*)("testFile.txt"), FA_OPEN_EXISTING | FA_READ);
+  //if(FR_OK != res && FR_EXIST != res);
+  //  return 1;
+  //char read[30] = {0};
+  //len = 30;
+  //res = f_read (&fp, read, len, (UINT*)&(len));
+  //if(FR_OK != res)
+  //  return 1;
+  //res = f_close (&fp);
+  //
+  //free(ffBuff);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -218,8 +222,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
-  MX_TouchGFX_Process();
+    MX_TouchGFX_Process();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
