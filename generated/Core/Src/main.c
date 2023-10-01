@@ -74,6 +74,8 @@ RTC_HandleTypeDef hrtc;
 
 SPI_HandleTypeDef hspi5;
 
+UART_HandleTypeDef huart1;
+
 SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
@@ -90,6 +92,7 @@ static void MX_FMC_Init(void);
 static void MX_LTDC_Init(void);
 static void MX_DMA2D_Init(void);
 static void MX_RTC_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 static void BSP_SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM_CommandTypeDef *Command);
 
@@ -126,6 +129,7 @@ static LCD_DrvTypeDef* LcdDrv;
 
 uint32_t I2c3Timeout = I2C3_TIMEOUT_MAX; /*<! Value of Timeout when I2C communication fails */  
 uint32_t Spi5Timeout = SPI5_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */  
+
 /* USER CODE END 0 */
 
 /**
@@ -165,6 +169,7 @@ int main(void)
   MX_FATFS_Init();
   MX_USB_DEVICE_Init();
   MX_RTC_Init();
+  MX_USART1_UART_Init();
   MX_TouchGFX_Init();
   /* USER CODE BEGIN 2 */
 
@@ -475,6 +480,39 @@ static void MX_SPI5_Init(void)
   /* USER CODE BEGIN SPI5_Init 2 */
 
   /* USER CODE END SPI5_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 256000;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_HalfDuplex_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
 
 }
 

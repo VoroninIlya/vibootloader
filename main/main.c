@@ -21,6 +21,10 @@
 #include "fatfs.h"
 #include "app_touchgfx.h"
 #include "usb_device.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <String.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -79,6 +83,8 @@ RTC_HandleTypeDef hrtc;
 
 SPI_HandleTypeDef hspi5;
 
+UART_HandleTypeDef huart1;
+
 SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
@@ -95,6 +101,7 @@ static void MX_FMC_Init(void);
 static void MX_LTDC_Init(void);
 static void MX_DMA2D_Init(void);
 static void MX_RTC_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 static void BSP_SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM_CommandTypeDef *Command);
 
@@ -133,6 +140,19 @@ uint32_t I2c3Timeout = I2C3_TIMEOUT_MAX; /*<! Value of Timeout when I2C communic
 uint32_t Spi5Timeout = SPI5_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */  
 
 static uint32_t* ffBuff;
+
+struct __FILE {
+  int handle;
+};
+FILE __stdout;
+int __io_putchar(int ch)
+{
+  HAL_UART_Transmit(&huart1, (const uint8_t*)(&ch), 1, 100);
+  return (ch);
+}
+int ferror(FILE *f) {
+  return 0;
+}
 /* USER CODE END 0 */
 
 /**
@@ -163,6 +183,8 @@ int main(void)
     (VIFLASH_EraseSector_t)HAL_FLASHEx_Erase, (VIFLASH_SectorToAddress_t)VIFLASH_SectorToAddress,
     (VIFLASH_AddressToSector_t)VIFLASH_AddressToSector, (VIFLASH_SectorSize_t)VIFLASH_SectorSize,
     VIFLASH_SectorToAddress(FLASH_SECTOR_6), VIFLASH_STOP_ADDRESS, _MIN_SS);
+  VIFLASH_SetPrintfCb(printf);
+  VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL1);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -176,21 +198,22 @@ int main(void)
   MX_FATFS_Init();
   MX_USB_DEVICE_Init();
   MX_RTC_Init();
+  MX_USART1_UART_Init();
   MX_TouchGFX_Init();
 
   /* USER CODE BEGIN 2 */
-  //ffBuff = (uint32_t*)malloc(1024);
-  //FATFS fs;
-  //FRESULT res = f_mount(&fs, (const TCHAR*)("M:"),	1);
-  //if(FR_OK != res) {
-  //  res = f_mkfs((const TCHAR*)("M:"), FM_ANY, _MIN_SS, (void*)ffBuff, 1024);
-  //  if(FR_OK != res)
-  //    return 1;
-  //  res = f_mount(&fs, (const TCHAR*)("M:"),	1);
-  //  if(FR_OK != res)
-  //    return 1;
-  //}
-  //
+  ffBuff = (uint32_t*)malloc(_MIN_SS);
+  FATFS fs;
+  FRESULT res = f_mount(&fs, (const TCHAR*)("M:"),	1);
+  if(FR_OK != res) {
+    res = f_mkfs((const TCHAR*)("M:"), FM_ANY, _MIN_SS, (void*)ffBuff, _MIN_SS);
+    if(FR_OK != res)
+      return 1;
+    res = f_mount(&fs, (const TCHAR*)("M:"),	1);
+    if(FR_OK != res)
+      return 1;
+  }
+  
   //FIL fp;
   //res = f_open(&fp, (const TCHAR*)("testFile.txt"), FA_CREATE_ALWAYS | FA_OPEN_APPEND | FA_WRITE | FA_READ);
   //if(FR_OK != res && FR_EXIST != res)
@@ -521,6 +544,39 @@ static void MX_SPI5_Init(void)
   /* USER CODE BEGIN SPI5_Init 2 */
 
   /* USER CODE END SPI5_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 256000;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_HalfDuplex_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
 
 }
 

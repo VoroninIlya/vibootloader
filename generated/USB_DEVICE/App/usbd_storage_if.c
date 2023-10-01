@@ -64,9 +64,9 @@
   * @{
   */
 
-#define STORAGE_LUN_NBR                  1
-#define STORAGE_BLK_NBR                  0x10000
-#define STORAGE_BLK_SIZ                  0x200
+//#define STORAGE_LUN_NBR                  1
+//#define STORAGE_BLK_NBR                  0x10000
+//#define STORAGE_BLK_SIZ                  0x200
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
 
@@ -185,8 +185,11 @@ int8_t STORAGE_Init_HS(uint8_t lun)
       (VIFLASH_Unlock_t) HAL_FLASH_Unlock, (VIFLASH_Lock_t) HAL_FLASH_Lock,
       (VIFLASH_EraseSector_t)HAL_FLASHEx_Erase, (VIFLASH_SectorToAddress_t)VIFLASH_SectorToAddress,
       (VIFLASH_AddressToSector_t)VIFLASH_AddressToSector, (VIFLASH_SectorSize_t)VIFLASH_SectorSize,
-      VIFLASH_SectorToAddress(FLASH_SECTOR_6), VIFLASH_STOP_ADDRESS, _MIN_SS))
-    return (USBD_OK);
+      VIFLASH_SectorToAddress(FLASH_SECTOR_6), VIFLASH_STOP_ADDRESS, _MIN_SS)){
+      VIFLASH_SetPrintfCb(printf);
+      VIFLASH_SetDebugLvl(VIFLASH_DEBUG_INFO);
+      return (USBD_OK);
+    }
   return (USBD_FAIL);
   /* USER CODE END 9 */
 }
@@ -299,7 +302,7 @@ int8_t STORAGE_Write_HS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t b
 int8_t STORAGE_GetMaxLun_HS(void)
 {
   /* USER CODE BEGIN 15 */
-  return (STORAGE_LUN_NBR - 1);
+  return 1; //(STORAGE_LUN_NBR - 1);
   /* USER CODE END 15 */
 }
 
