@@ -1,5 +1,5 @@
 {
-    "cortex-debug.armToolchainPath": "C:/SysGCC/arm-eabi/bin",
+    "cortex-debug.armToolchainPath": "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/",
     "files.associations": {
       "cstdlib": "c",
       "typeinfo": "c",
@@ -19,7 +19,10 @@
       "stdio.h": "c",
       "cstdio": "c",
       "fatfs.h": "c",
-      "string.h": "c"
+      "string.h": "c",
+      "vibootloadercore_private.h": "c",
+      "main.h": "c",
+      "vibuttonctrl_private.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }
