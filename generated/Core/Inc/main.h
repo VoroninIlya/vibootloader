@@ -53,10 +53,14 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+uint8_t IsHalTickOverflowed(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define User_Button_Pin GPIO_PIN_0
+#define User_Button_GPIO_Port GPIOA
+#define User_Button_EXTI_IRQn EXTI0_IRQn
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
