@@ -12,11 +12,16 @@
         "type": "cortex-debug",
         "runToEntryPoint": "main",
         //"device": "STM32F429ZI",
-        "servertype":"stlink",
+        "servertype":"openocd",
         "interface": "swd",
         "svdFile": "${workspaceFolder}/gcc/STM32F429.svd",
         "v1": false,
         "showDevDebugOutput": "both",
+        "configFiles": 
+        [
+            "interface/stlink-v2.cfg",
+            "target/stm32f4x.cfg"
+        ],
          /* Will get automatically detected if STM32CubeIDE is installed to default directory
            or it can be manually provided if necessary.. */
         //"serverpath": "c:\\ST\\STM32CubeIDE_1.7.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.win32_2.0.100.202109301221\\tools\\bin\\ST-LINK_gdbserver.exe",
