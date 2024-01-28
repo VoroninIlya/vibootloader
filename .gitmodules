@@ -10,3 +10,12 @@
 [submodule "modules/vistm32helpers"]
 	path = modules/vistm32helpers
 	url = git@github.com:VoroninIlya/vistm32helpers.git
+[submodule "modules/vibootloadercore"]
+	path = modules/vibootloadercore
+	url = git@github.com:VoroninIlya/vibootloadercore.git
+[submodule "modules/viswtimer"]
+	path = modules/viswtimer
+	url = git@github.com:VoroninIlya/viswtimer.git
+[submodule "modules/vibuttonctrl"]
+	path = modules/vibuttonctrl
+	url = git@github.com:VoroninIlya/vibuttonctrl.git

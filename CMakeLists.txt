@@ -43,6 +43,9 @@ add_subdirectory(${PROJ_PATH}/modules/unity)
 add_subdirectory(${PROJ_PATH}/modules/vistmachine)
 add_subdirectory(${PROJ_PATH}/modules/viflashdrv)
 add_subdirectory(${PROJ_PATH}/modules/vistm32helpers)
+add_subdirectory(${PROJ_PATH}/modules/viswtimer)
+add_subdirectory(${PROJ_PATH}/modules/vibuttonctrl)
+add_subdirectory(${PROJ_PATH}/modules/vibootloadercore)
 
 get_property(sources GLOBAL PROPERTY sources_list)
 get_property(includes GLOBAL PROPERTY include_paths_list)
@@ -86,7 +89,7 @@ target_link_options(${EXECUTABLE} PRIVATE
 )
 
 target_link_libraries(${EXECUTABLE} PRIVATE "${PROJ_PATH}/generated/Middlewares/ST/touchgfx/lib/core/cortex_m4f/gcc/libtouchgfx-float-abi-hard.a")
-target_link_libraries(${EXECUTABLE} PRIVATE vistmachine viflashdrv)
+target_link_libraries(${EXECUTABLE} PRIVATE vistmachine viflashdrv viswtimer vibootloadercore vibuttonctrl)
 
 # Execute post-build to print size
 add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
