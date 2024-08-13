@@ -31,11 +31,9 @@
 #include "Components/ili9341/ili9341.h"
 
 #if !defined(ONLY_TOHCGFX_GENERATED)
-#include "viflashdrv.h"
-#include "vistm32flash.h"
-#include "vistm32button.h"
-#include "viswtimer.h"
 #include "vibuttonctrl.h"
+#include "viswtimer.h"
+#include "vistm32button.h"
 #include "vibootloadercore.h"
 #endif
 /* USER CODE END Includes */
@@ -75,6 +73,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+extern uint32_t g_pfnVectors, _svectors, _stext, ram_vectors;
+
 CRC_HandleTypeDef hcrc;
 
 DMA2D_HandleTypeDef hdma2d;
@@ -107,9 +107,9 @@ static void MX_DMA2D_Init(void);
 static void MX_RTC_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
+static void PrepareAndJumpToFirmware(uint32_t fileAddrInFlash);
+
 static void BSP_SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM_CommandTypeDef *Command);
-
-
 
 static uint8_t            I2C3_ReadData(uint8_t Addr, uint8_t Reg);
 static void               I2C3_WriteData(uint8_t Addr, uint8_t Reg, uint8_t Value);
@@ -143,7 +143,7 @@ static LCD_DrvTypeDef* LcdDrv;
 uint32_t I2c3Timeout = I2C3_TIMEOUT_MAX; /*<! Value of Timeout when I2C communication fails */  
 uint32_t Spi5Timeout = SPI5_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */  
 
-static uint32_t* ffBuff;
+TCHAR* tmpBuffer[255];
 
 struct __FILE {
   int handle;
@@ -157,6 +157,13 @@ int __io_putchar(int ch)
 int ferror(FILE *f) {
   return 0;
 }
+
+__attribute__((section(".bootloader_data"))) __attribute__((aligned(4)))
+struct
+{
+  uint32_t parameter1;
+  uint32_t parameter2;
+} bootloader_data __attribute__((section(".bootloader_data"))) __attribute__((aligned(4)));
 /* USER CODE END 0 */
 
 /**
@@ -167,6 +174,9 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+  uint32_t* addr = &bootloader_data.parameter1;
+
+  (*addr) = 0xAA55;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -182,13 +192,6 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  VIFLASH_InitDriver((VIFLASH_Program_t) HAL_FLASH_Program,
-    (VIFLASH_Unlock_t) HAL_FLASH_Unlock, (VIFLASH_Lock_t) HAL_FLASH_Lock,
-    (VIFLASH_EraseSector_t)HAL_FLASHEx_Erase, (VIFLASH_SectorToAddress_t)VIFLASH_SectorToAddress,
-    (VIFLASH_AddressToSector_t)VIFLASH_AddressToSector, (VIFLASH_SectorSize_t)VIFLASH_SectorSize,
-    VIFLASH_SectorToAddress(FLASH_SECTOR_6), VIFLASH_STOP_ADDRESS, _MIN_SS);
-  VIFLASH_SetPrintfCb(printf);
-  VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL1);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -206,51 +209,23 @@ int main(void)
   MX_TouchGFX_Init();
 
   /* USER CODE BEGIN 2 */
-  //VISWTIM_Init(1);
-  VIBTCTR_Init(VIBTCTR_GetPortState, HAL_GetTick, IsHalTickOverflowed);
+  if(!MX_FATFS_IsFileSystemInitialized()) {
+    Error_Handler();
+  }
+  // Button driver should be initialized after GPIO 
+  if (!VIBTCTR_Init(VIBTCTR_GetPortState, HAL_GetTick, IsHalTickOverflowed)) {
+    Error_Handler();
+  }
   VIBTCTR_Create("UserButton", (void*)User_Button_GPIO_Port, (uint16_t)User_Button_Pin);
   VIBTCTR_SetPrintfCb(printf);
   VIBTCTR_SetDebugLvl(VIBTCTR_DEBUG_LVL1);
-  //VISWTIM_Create("testtim1");
-  //VISWTIM_Start("testtim1", 5000);
-  //while(!VISWTIM_isExpired("testtim1")){;}
-
-  ffBuff = (uint32_t*)malloc(_MIN_SS);
-  FATFS fs;
-  FRESULT res = f_mount(&fs, (const TCHAR*)("M:"),	1);
-  if(FR_OK != res) {
-    res = f_mkfs((const TCHAR*)("M:"), FM_ANY, _MIN_SS, (void*)ffBuff, _MIN_SS);
-    if(FR_OK != res)
-      return 1;
-    res = f_mount(&fs, (const TCHAR*)("M:"),	1);
-    if(FR_OK != res)
-      return 1;
+  // Initialize software timer driver
+  VISWTIM_Init(1);
+  // Initialize bootloader core
+  MX_FATFS_ConvertToUnicode(tmpBuffer, "0:/vifirmware.bin", strlen("0:/vifirmware.bin"));
+  if(!VIBCORE_Init("UserButton", tmpBuffer, PrepareAndJumpToFirmware)) {
+    Error_Handler();
   }
-  
-  //FIL fp;
-  //res = f_open(&fp, (const TCHAR*)("testFile.txt"), FA_CREATE_ALWAYS | FA_OPEN_APPEND | FA_WRITE | FA_READ);
-  //if(FR_OK != res && FR_EXIST != res)
-  //  return 1;
-  //char* str = "Hallo from file\n";
-  //uint32_t len = strlen(str);
-  //res = f_write (&fp, str, len, (UINT*)&(len));
-  //if(FR_OK != res)
-  //  return 1;
-  //res = f_sync (&fp);
-  //res = f_close (&fp);
-  //if(FR_OK != res)
-  //  return 1;
-  //res = f_open(&fp, (const TCHAR*)("testFile.txt"), FA_OPEN_EXISTING | FA_READ);
-  //if(FR_OK != res && FR_EXIST != res);
-  //  return 1;
-  //char read[30] = {0};
-  //len = 30;
-  //res = f_read (&fp, read, len, (UINT*)&(len));
-  //if(FR_OK != res)
-  //  return 1;
-  //res = f_close (&fp);
-  //
-  //free(ffBuff);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -259,9 +234,9 @@ int main(void)
   {
     /* USER CODE END WHILE */
     MX_TouchGFX_Process();
-    VIBCORE_Runtime();
-
     /* USER CODE BEGIN 3 */
+    VIBCORE_Runtime();
+    VIBTCTR_Runtime();
   }
   /* USER CODE END 3 */
 }
@@ -1024,6 +999,40 @@ void LCD_Delay(uint32_t Delay)
   HAL_Delay(Delay);
 }
 
+void PrepareAndJumpToFirmware(uint32_t fileAddrInFlash) {
+
+  // deinit system ======================================
+  __disable_irq(); 
+
+  HAL_DeInit();
+
+  MX_TouchGFX_ClearDisplay();
+
+  SCB->VTOR = (uint32_t)fileAddrInFlash;
+
+  typedef void (*pFunction)(void);  
+	pFunction Jump_To_Application = (pFunction)(*(uint32_t*)(fileAddrInFlash + 4));
+	__set_MSP(*(uint32_t*) fileAddrInFlash);
+	Jump_To_Application();
+
+  // copy vector table of firmware to ram considered offset
+  //uint32_t vectortableOffset = fileAddrInFlash - FLASH_BASE;
+  //uint32_t vectorTableSize = (&_stext) - (&_svectors);
+  //
+  //*(&ram_vectors) = *(uint32_t*)(fileAddrInFlash);
+
+  //for(uint32_t i = 1; i < vectorTableSize; i++) {
+  //  uint32_t val = *((uint32_t*)(fileAddrInFlash) + i);
+  //  *((uint32_t*)&ram_vectors + i) = val;
+  //}
+
+  //SCB->VTOR = (uint32_t)&ram_vectors;
+
+  //typedef void (*pFunction)(void);  
+	//pFunction Jump_To_Application = (pFunction)(*((&ram_vectors) + 1));
+	//__set_MSP(*(uint32_t*) &ram_vectors);
+	//Jump_To_Application();
+}
 /* USER CODE END 4 */
 
 /**

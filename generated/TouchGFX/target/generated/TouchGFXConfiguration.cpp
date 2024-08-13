@@ -33,9 +33,8 @@ extern "C" void touchgfx_components_init();
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-extern "C" {
-	void     LCD_IO_WriteReg(uint8_t Reg);
-}
+extern "C" void touchgfx_clear_display();
+extern "C" void LCD_IO_WriteReg(uint8_t Reg);
 /* USER CODE END PFP */
 
 
@@ -68,10 +67,10 @@ void touchgfx_init()
 	/* USER CODE BEGIN 0 */
     //HAL_Delay(10);
 	
-	  while(!OSWrappers::isVSyncAvailable()){}
+	while(!OSWrappers::isVSyncAvailable()){}
     hal.backPorchExited();
 			
-	  LCD_IO_WriteReg(0x29);
+	LCD_IO_WriteReg(0x29);
     /* USER CODE END 0 */
 }
 
@@ -91,5 +90,11 @@ void touchgfx_taskEntry()
         hal.backPorchExited();
     }
 }
+
+/* USER CODE BEGIN 1 */
+void touchgfx_clear_display() {
+    
+}
+/* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

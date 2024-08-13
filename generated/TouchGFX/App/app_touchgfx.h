@@ -47,7 +47,7 @@ void MX_TouchGFX_Init(void);
 void MX_TouchGFX_Process(void);
 
 /* USER CODE BEGIN EFP */
-
+void MX_TouchGFX_ClearDisplay(void);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

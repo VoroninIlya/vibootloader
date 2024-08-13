@@ -88,10 +88,12 @@
     "DisplayOrientation": "Portrait",
     "Family": "STM32F4",
     "SubFamily": "STM32F429/439",
+    "Toolchain": "MDK-ARM V5.32",
     "Platform": "m4",
     "ProjectFile": "../stm32f429i-disco-boot.ioc",
     "OptionalComponentsRoot": "../Middlewares/ST/touchgfx_components",
-    "OptionalComponents": []
+    "OptionalComponents": [],
+    "AdditionalFeatures": []
   },
   "Version": "4.23.1"
 }

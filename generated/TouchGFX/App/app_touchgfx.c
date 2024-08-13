@@ -49,7 +49,11 @@ void touchgfx_components_init(void);
 void touchgfx_taskEntry(void);
 
 /* USER CODE BEGIN PFP */
+void touchgfx_clear_display(void);
 
+void MX_TouchGFX_ClearDisplay(void) {
+  touchgfx_clear_display();
+}
 /* USER CODE END PFP */
 
 /**

@@ -41,7 +41,7 @@ MEMORY
 {
   CCMRAM   (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K
   RAM      (xrw)    : ORIGIN = 0x20000000,   LENGTH = 192K
-  FLASH    (rx)     : ORIGIN = 0x8000000,    LENGTH = 2048K
+  FLASH    (rx)     : ORIGIN = 0x8000000,    LENGTH = 0x4D000
   SDRAM    (xrw)    : ORIGIN = 0xD0000000,   LENGTH = 8M
 }
 
@@ -54,6 +54,7 @@ _Min_Stack_Size = 0xA00; /* required amount of stack */
 /* Sections */
 SECTIONS
 {
+  _svectors = LOADADDR(.isr_vector);
   /* The startup code into "FLASH" Rom type memory */
   .isr_vector :
   {
@@ -62,6 +63,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
+  _stext = LOADADDR(.text);
   /* The program code and other data into "FLASH" Rom type memory */
   .text :
   {
@@ -132,6 +134,14 @@ SECTIONS
   } >FLASH
 
   /* Used by the startup to initialize data */
+  .bootloader_data (NOLOAD): {
+    . = ALIGN(4);
+    ram_vectors = .;            /* define a global symbol*/
+    . = . + _stext - _svectors; /* reserve place for vectortable*/
+    *(bootloader_data)
+    . = ALIGN(4);
+  }>RAM
+
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections into "RAM" Ram type memory */

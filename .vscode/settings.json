@@ -22,7 +22,9 @@
       "string.h": "c",
       "vibootloadercore_private.h": "c",
       "main.h": "c",
-      "vibuttonctrl_private.h": "c"
+      "vibuttonctrl_private.h": "c",
+      "app_touchgfx.h": "c",
+      "vibootloadercore.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

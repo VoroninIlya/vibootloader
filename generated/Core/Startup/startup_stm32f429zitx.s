@@ -32,6 +32,10 @@
 .global  g_pfnVectors
 .global  Default_Handler
 
+/* start address for the vectors section. defined in linker script */  
+.word  _svectors
+/* start address for the text section. defined in linker script */  
+.word  _stext
 /* start address for the initialization values of the .data section. 
 defined in linker script */
 .word  _sidata

@@ -9,7 +9,7 @@
       <Text Id="__SingleUse_AF10" Alignment="Left" TypographyId="wheel_selector_small">
         <Translation Language="GB">Bootloader</Translation>
       </Text>
-      <Text Id="__SingleUse_K0AZ" Alignment="Left" TypographyId="wheel_selector_small">
+      <Text Id="__SingleUse_K0AZ" Alignment="Center" TypographyId="wheel_selector_small">
         <Translation Language="GB">Hallo world!</Translation>
       </Text>
     </TextGroup>
