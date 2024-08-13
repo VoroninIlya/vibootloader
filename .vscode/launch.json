@@ -4,28 +4,91 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Debug Microcontroller - STLink-V2",
-            "cwd": "${workspaceFolder}",
-            "executable": "${command:cmake.launchTargetPath}",
-            "request": "launch",
-            "type": "cortex-debug",
-            "runToEntryPoint": "main",
-            //"device": "STM32F429ZI",
-            "servertype":"stlink",
-            "interface": "swd",
-            "svdFile": "${workspaceFolder}/gcc/STM32F429.svd",
-            "v1": false,
-            "showDevDebugOutput": "both",
-
-             /* Will get automatically detected if STM32CubeIDE is installed to default directory
-               or it can be manually provided if necessary.. */
-            //"serverpath": "c:\\ST\\STM32CubeIDE_1.7.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.win32_2.0.100.202109301221\\tools\\bin\\ST-LINK_gdbserver.exe",
-            //"armToolchainPath": "c:\\ST\\STM32CubeIDE_1.7.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_2.0.0.202105311346\\tools\\bin",
-            //"stm32cubeprogrammer": "c:\\Program Files\\STMicroelectronics\\STM32Cube\\STM32CubeProgrammer\\bin",
-
-            /* If you use external loader, add additional arguments */
-            //"serverArgs": ["--extload", "path/to/ext/loader.stldr"],
+      {
+        "name": "Debug Microcontroller - STLink-V2",
+        "cwd": "${workspaceFolder}",
+        "executable": "${command:cmake.launchTargetPath}",
+        "request": "launch",
+        "type": "cortex-debug",
+        "runToEntryPoint": "main",
+        "device": "STM32F429ZIT6",
+        "servertype":"openocd",
+        "interface": "swd",
+        "svdFile": "${workspaceFolder}/generated/gcc/STM32F429x.svd",
+        "v1": false,
+        "showDevDebugOutput": "both",
+        "configFiles": 
+        [
+            //"interface/stlink-v2.cfg",
+            //"target/stm32f4x.cfg"
+            "board/stm32f429discovery.cfg"
+        ],
+        "swoConfig": {
+          "enabled": true,
+          "cpuFrequency": 160000000,
+          "swoFrequency": 2000000,
+          "source": "probe",
+          "decoders": [
+              { "type": "console", "label": "ITM", "port": 0 }
+          ]
         }
+         /* Will get automatically detected if STM32CubeIDE is installed to default directory
+           or it can be manually provided if necessary.. */
+        //"serverpath": "c:\\ST\\STM32CubeIDE_1.7.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.win32_2.0.100.202109301221\\tools\\bin\\ST-LINK_gdbserver.exe",
+        //"armToolchainPath": "c:\\ST\\STM32CubeIDE_1.7.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_2.0.0.202105311346\\tools\\bin",
+        //"stm32cubeprogrammer": "c:\\Program Files\\STMicroelectronics\\STM32Cube\\STM32CubeProgrammer\\bin",
+        /* If you use external loader, add additional arguments */
+        //"serverArgs": ["--extload", "path/to/ext/loader.stldr"],
+      },
+      {
+        "name": "Debug Microcontroller - Ulink2",
+        "cwd": "${workspaceFolder}",
+        "executable": "${command:cmake.launchTargetPath}",
+        "request": "launch",
+        "type": "cortex-debug",
+        "runToEntryPoint": "main",
+        "device": "STM32F429ZIT6",
+        "servertype":"openocd",
+        "interface": "swd",
+        "svdFile": "${workspaceFolder}/generated/gcc/STM32F429x.svd",
+        "v1": false,
+        "showDevDebugOutput": "both",
+        "configFiles": 
+        [
+            "interface/cmsis-dap.cfg",
+            "target/stm32f4x.cfg"
+        ],
+      },
+      {
+        "name": "(gdb) Launch",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/Debug_win64/tst_vibootloader.exe",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [
+          {
+            // add the directory where our target was built to the PATHs
+            // it gets resolved by CMake Tools:
+            "name": "PATH",
+            "value": "$PATH:${command:cmake.launchTargetDirectory}"
+          },
+        ],
+        "externalConsole": true,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          },
+          {
+            "description": "Set Disassembly Flavor to Intel",
+            "text": "-gdb-set disassembly-flavor intel",
+            "ignoreFailures": true
+          }
+        ]
+      }
     ]
 }

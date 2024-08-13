@@ -5,7 +5,8 @@
             "type": "cppbuild",
             "label": "Build project",
             "command": "cmake",
-            "args": ["--build", "${command:cmake.buildDirectory}", "-j", "8"],
+            "args": ["--build", "${command:cmake.buildDirectory}", 
+              "-j", "8"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -51,32 +52,48 @@
             "problemMatcher": []
         },
         {
-            "type": "shell",
-            "label": "CubeProg: Flash project with defined serial number (SWD) - you must set serial number first",
-            "command": "STM32_Programmer_CLI",
-            "args": [
-                "--connect",
-                "port=swd",
-                "sn=<yourserialnumber>",
-                "--download", "${command:cmake.launchTargetPath}",
-                "-hardRst"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "type": "shell",
-            "label": "CubeProg: List all available communication interfaces",
-            "command": "STM32_Programmer_CLI",
-            "args": [
-                "--list",
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
+          "type": "shell",
+          "label": "CubeProg: Flash full erase",
+          "command": "STM32_Programmer_CLI",
+          "args": [
+              "--connect",
+              "port=swd",
+              "--erase",
+              "all",
+              "-hardRst"
+          ],
+          "options": {
+              "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+      },
+      {
+          "type": "shell",
+          "label": "CubeProg: Flash project with defined serial number (SWD) - you must set serial number first",
+          "command": "STM32_Programmer_CLI",
+          "args": [
+              "--connect",
+              "port=swd",
+              "sn=<yourserialnumber>",
+              "--download", "${command:cmake.launchTargetPath}",
+              "-hardRst"
+          ],
+          "options": {
+              "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+      },
+      {
+          "type": "shell",
+          "label": "CubeProg: List all available communication interfaces",
+          "command": "STM32_Programmer_CLI",
+          "args": [
+              "--list",
+          ],
+          "options": {
+              "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+      }
     ]
 }

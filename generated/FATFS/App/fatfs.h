@@ -39,7 +39,9 @@ extern FIL USERFile; /* File object for USER */
 void MX_FATFS_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+void MX_FATFS_Deinit(void);
+uint8_t MX_FATFS_IsFileSystemInitialized(void);
+void MX_FATFS_ConvertToUnicode(WCHAR* dest, const char* src, size_t len);
 /* USER CODE END Prototypes */
 #ifdef __cplusplus
 }

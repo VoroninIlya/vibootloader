@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextDatabase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="texts.xsd" Version="4.20.0">
+<TextDatabase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="texts.xsd" Version="4.23.1">
   <Languages>
     <Language Id="GB" />
   </Languages>
@@ -9,13 +9,13 @@
       <Text Id="__SingleUse_AF10" Alignment="Left" TypographyId="wheel_selector_small">
         <Translation Language="GB">Bootloader</Translation>
       </Text>
-      <Text Id="__SingleUse_K0AZ" Alignment="Left" TypographyId="wheel_selector_small">
+      <Text Id="__SingleUse_K0AZ" Alignment="Center" TypographyId="wheel_selector_small">
         <Translation Language="GB">Hallo world!</Translation>
       </Text>
     </TextGroup>
   </Texts>
   <Typographies>
-    <Typography Id="wheel_selector_small" Font="Asap-Regular.ttf" Size="24" Bpp="4" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
-    <Typography Id="wheel_selector_large" Font="Asap-Regular.ttf" Size="32" Bpp="4" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
+    <Typography Id="wheel_selector_small" Font="Asap-Regular.ttf" Size="24" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
+    <Typography Id="wheel_selector_large" Font="Asap-Regular.ttf" Size="32" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
   </Typographies>
 </TextDatabase>

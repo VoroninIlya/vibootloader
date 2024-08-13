@@ -7,23 +7,26 @@
 
 MainViewBase::MainViewBase()
 {
-
     __background.setPosition(0, 0, 240, 320);
     __background.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    add(__background);
 
     textArea1.setXY(54, 78);
     textArea1.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
     textArea1.setLinespacing(0);
     textArea1.setTypedText(touchgfx::TypedText(T___SINGLEUSE_K0AZ));
+    add(textArea1);
 
     textArea2.setXY(61, 114);
     textArea2.setColor(touchgfx::Color::getColorFromRGB(235, 124, 124));
     textArea2.setLinespacing(0);
     textArea2.setTypedText(touchgfx::TypedText(T___SINGLEUSE_AF10));
-
-    add(__background);
-    add(textArea1);
     add(textArea2);
+}
+
+MainViewBase::~MainViewBase()
+{
+
 }
 
 void MainViewBase::setupScreen()

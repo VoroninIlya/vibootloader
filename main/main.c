@@ -21,10 +21,21 @@
 #include "fatfs.h"
 #include "app_touchgfx.h"
 #include "usb_device.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <String.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Components/ili9341/ili9341.h"
+
+#if !defined(ONLY_TOHCGFX_GENERATED)
+#include "vibuttonctrl.h"
+#include "viswtimer.h"
+#include "vistm32button.h"
+#include "vibootloadercore.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,6 +73,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+extern uint32_t g_pfnVectors, _svectors, _stext, ram_vectors;
+
 CRC_HandleTypeDef hcrc;
 
 DMA2D_HandleTypeDef hdma2d;
@@ -73,6 +86,8 @@ LTDC_HandleTypeDef hltdc;
 RTC_HandleTypeDef hrtc;
 
 SPI_HandleTypeDef hspi5;
+
+UART_HandleTypeDef huart1;
 
 SDRAM_HandleTypeDef hsdram1;
 
@@ -90,10 +105,11 @@ static void MX_FMC_Init(void);
 static void MX_LTDC_Init(void);
 static void MX_DMA2D_Init(void);
 static void MX_RTC_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
+static void PrepareAndJumpToFirmware(uint32_t fileAddrInFlash);
+
 static void BSP_SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM_CommandTypeDef *Command);
-
-
 
 static uint8_t            I2C3_ReadData(uint8_t Addr, uint8_t Reg);
 static void               I2C3_WriteData(uint8_t Addr, uint8_t Reg, uint8_t Value);
@@ -126,6 +142,28 @@ static LCD_DrvTypeDef* LcdDrv;
 
 uint32_t I2c3Timeout = I2C3_TIMEOUT_MAX; /*<! Value of Timeout when I2C communication fails */  
 uint32_t Spi5Timeout = SPI5_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */  
+
+TCHAR* tmpBuffer[255];
+
+struct __FILE {
+  int handle;
+};
+FILE __stdout;
+int __io_putchar(int ch)
+{
+  HAL_UART_Transmit(&huart1, (const uint8_t*)(&ch), 1, 100);
+  return (ch);
+}
+int ferror(FILE *f) {
+  return 0;
+}
+
+__attribute__((section(".bootloader_data"))) __attribute__((aligned(4)))
+struct
+{
+  uint32_t parameter1;
+  uint32_t parameter2;
+} bootloader_data __attribute__((section(".bootloader_data"))) __attribute__((aligned(4)));
 /* USER CODE END 0 */
 
 /**
@@ -136,6 +174,9 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+  uint32_t* addr = &bootloader_data.parameter1;
+
+  (*addr) = 0xAA55;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -151,7 +192,6 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -163,11 +203,29 @@ int main(void)
   MX_LTDC_Init();
   MX_DMA2D_Init();
   MX_FATFS_Init();
+  MX_USB_DEVICE_Init();
   MX_RTC_Init();
+  MX_USART1_UART_Init();
   MX_TouchGFX_Init();
-	MX_USB_DEVICE_Init();
-  /* USER CODE BEGIN 2 */
 
+  /* USER CODE BEGIN 2 */
+  if(!MX_FATFS_IsFileSystemInitialized()) {
+    Error_Handler();
+  }
+  // Button driver should be initialized after GPIO 
+  if (!VIBTCTR_Init(VIBTCTR_GetPortState, HAL_GetTick, IsHalTickOverflowed)) {
+    Error_Handler();
+  }
+  VIBTCTR_Create("UserButton", (void*)User_Button_GPIO_Port, (uint16_t)User_Button_Pin);
+  VIBTCTR_SetPrintfCb(printf);
+  VIBTCTR_SetDebugLvl(VIBTCTR_DEBUG_LVL1);
+  // Initialize software timer driver
+  VISWTIM_Init(1);
+  // Initialize bootloader core
+  MX_FATFS_ConvertToUnicode(tmpBuffer, "0:/vifirmware.bin", strlen("0:/vifirmware.bin"));
+  if(!VIBCORE_Init("UserButton", tmpBuffer, PrepareAndJumpToFirmware)) {
+    Error_Handler();
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -175,9 +233,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
-  MX_TouchGFX_Process();
+    MX_TouchGFX_Process();
     /* USER CODE BEGIN 3 */
+    VIBCORE_Runtime();
+    VIBTCTR_Runtime();
   }
   /* USER CODE END 3 */
 }
@@ -478,6 +537,39 @@ static void MX_SPI5_Init(void)
 
 }
 
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 256000;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_HalfDuplex_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
 /* FMC initialization function */
 static void MX_FMC_Init(void)
 {
@@ -536,6 +628,8 @@ static void MX_FMC_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOF_CLK_ENABLE();
@@ -560,6 +654,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : User_Button_Pin */
+  GPIO_InitStruct.Pin = User_Button_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(User_Button_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : PD12 PD13 */
   GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -567,6 +667,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -893,6 +999,40 @@ void LCD_Delay(uint32_t Delay)
   HAL_Delay(Delay);
 }
 
+void PrepareAndJumpToFirmware(uint32_t fileAddrInFlash) {
+
+  // deinit system ======================================
+  __disable_irq(); 
+
+  HAL_DeInit();
+
+  MX_TouchGFX_ClearDisplay();
+
+  SCB->VTOR = (uint32_t)fileAddrInFlash;
+
+  typedef void (*pFunction)(void);  
+	pFunction Jump_To_Application = (pFunction)(*(uint32_t*)(fileAddrInFlash + 4));
+	__set_MSP(*(uint32_t*) fileAddrInFlash);
+	Jump_To_Application();
+
+  // copy vector table of firmware to ram considered offset
+  //uint32_t vectortableOffset = fileAddrInFlash - FLASH_BASE;
+  //uint32_t vectorTableSize = (&_stext) - (&_svectors);
+  //
+  //*(&ram_vectors) = *(uint32_t*)(fileAddrInFlash);
+
+  //for(uint32_t i = 1; i < vectorTableSize; i++) {
+  //  uint32_t val = *((uint32_t*)(fileAddrInFlash) + i);
+  //  *((uint32_t*)&ram_vectors + i) = val;
+  //}
+
+  //SCB->VTOR = (uint32_t)&ram_vectors;
+
+  //typedef void (*pFunction)(void);  
+	//pFunction Jump_To_Application = (pFunction)(*((&ram_vectors) + 1));
+	//__set_MSP(*(uint32_t*) &ram_vectors);
+	//Jump_To_Application();
+}
 /* USER CODE END 4 */
 
 /**

@@ -22,6 +22,8 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "viswtimer.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* External functions --------------------------------------------------------*/
@@ -44,7 +46,7 @@ void SystemClock_Config(void);
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+static uint8_t isHalTickOverflowed;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -192,7 +194,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+  VISWTIM_Handler();
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -202,6 +204,20 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles EXTI line0 interrupt.
+  */
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+
+  /* USER CODE END EXTI0_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(User_Button_Pin);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+
+  /* USER CODE END EXTI0_IRQn 1 */
+}
 
 /**
   * @brief This function handles USB On The Go HS wake-up interrupt through EXTI line 20.
@@ -267,5 +283,22 @@ void DMA2D_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+void HAL_IncTick(void)
+{
+  uint32_t pre = uwTick;
+  uwTick += uwTickFreq;
+
+  if(uwTick < pre && !isHalTickOverflowed)
+    isHalTickOverflowed = 1;
+}
+
+uint8_t IsHalTickOverflowed(void) {
+  if(isHalTickOverflowed) {
+    isHalTickOverflowed = 0;
+    return 1;
+  }
+  return 0;
+}
 
 /* USER CODE END 1 */
